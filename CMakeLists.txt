@@ -13,9 +13,21 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
+# FFmpeg的头文件搜索路径
+include_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/include/)
+# 动态链接库或静态链接库的搜索路径
+link_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/lib/)
+
 add_executable(qt_clion main.cpp mainWindow.h mainWindow.cpp mainWindow.ui)
 target_link_libraries(qt_clion
         Qt::Core
         Qt::Widgets
+        avcodec
+        avdevice
+        avfilter
+        avformat
+        avutil
+        postproc
+        swscale
+        swresample
         )
-
