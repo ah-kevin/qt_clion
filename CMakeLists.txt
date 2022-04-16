@@ -18,7 +18,7 @@ include_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/include/)
 # 动态链接库或静态链接库的搜索路径
 link_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/lib/)
 
-add_executable(qt_clion main.cpp mainWindow.h mainWindow.cpp mainWindow.ui)
+add_executable(qt_clion main.cpp mainWindow.h mainWindow.cpp mainWindow.ui single/sender.cpp single/sender.h single/receiver.cpp single/receiver.h)
 target_link_libraries(qt_clion
         Qt::Core
         Qt::Widgets
