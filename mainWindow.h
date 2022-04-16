@@ -22,5 +22,6 @@ public:
 
 private:
     struct Ui_MainWindow *ui{};
+    void slotAndSingle();
 };
 #endif //QT_CLION_MAINWINDOW_H
