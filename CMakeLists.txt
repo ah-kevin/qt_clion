@@ -18,7 +18,7 @@ include_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/include/)
 # 动态链接库或静态链接库的搜索路径
 link_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/lib/)
 
-add_executable(qt_clion main.cpp mainWindow.h mainWindow.cpp mainWindow.ui single/sender.cpp single/sender.h single/receiver.cpp single/receiver.h)
+add_executable(qt_clion MACOSX_BUNDLE main.cpp mainWindow.h mainWindow.cpp mainWindow.ui single/sender.cpp single/sender.h single/receiver.cpp single/receiver.h audiothread.cpp audiothread.h)
 target_link_libraries(qt_clion
         Qt::Core
         Qt::Widgets
@@ -31,3 +31,5 @@ target_link_libraries(qt_clion
         swscale
         swresample
         )
+set_target_properties(qt_clion PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/mac/Info.plist)

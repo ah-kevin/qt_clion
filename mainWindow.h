@@ -20,8 +20,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+private slots:
+    void on_audioButton_clicked();// clazy:exclude=connect-by-name
+
 private:
     struct Ui_MainWindow *ui{};
     void slotAndSingle();
+    struct AudioThread *_audioThread = nullptr;
 };
 #endif //QT_CLION_MAINWINDOW_H

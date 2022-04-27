@@ -5,12 +5,16 @@
 // 纯C语言的
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavdevice/avdevice.h>
 }
 
 int main(int argc, char *argv[]) {
 //    QCoreApplication a(argc, argv);
 //    qDebug() << "Hello World";
 //    return QCoreApplication::exec();
+
+    // 注册设备
+    avdevice_register_all();
     // 打印版本号
     qDebug() << av_version_info();
     // 创建一个QApplication对象
