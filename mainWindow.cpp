@@ -8,6 +8,8 @@
 #include "single/receiver.h"
 #include "audiothread.h"
 #include "SDL2/SDL.h"
+#include <QFile>
+#include "playthread.h"
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui_MainWindow) {
@@ -17,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
     delete ui;
 }
+
 
 void MainWindow::on_audioButton_clicked() {
     if (!_audioThread) {
@@ -40,10 +43,13 @@ void MainWindow::on_audioButton_clicked() {
     }
 }
 
-[[maybe_unused]] void MainWindow::on_registerButton_clicked() {
-    SDL_version version;
-    SDL_VERSION(&version);
-    qDebug() <<version.major <<version.minor << version.patch;
+
+void MainWindow::on_registerButton_clicked() {
+    //    SDL_version version;
+    //    SDL_VERSION(&version);
+    //    qDebug() <<version.major <<version.minor << version.patch;
+    auto playThread = new PlayThread(this);
+    playThread->start();
 }
 
 void MainWindow::slotAndSingle() {
