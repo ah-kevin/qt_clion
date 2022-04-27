@@ -4,6 +4,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QDateTime>
 #include "audiothread.h"
 
 extern "C" {
@@ -21,11 +22,11 @@ extern "C" {
 // 设备名称
 #define DEVICE_NAME "audio=麦克风阵列 (Realtek(R) Audio)"
 // PCM文件名
-#define FILENAME "F://out.pcm"
+#define FILEPATH "D://"
 #else
 #define FMT_NAME "avfoundation"
 #define DEVICE_NAME ":0"
-#define FILENAME "/Users/bjke/workspaces/c++/qt-sound/out.pcm"
+#define FILEPATH "/Users/bjke/workspaces/c++/qt-sound/data"
 #endif
 
 AudioThread::AudioThread(QObject *parent) : QThread(parent) {
@@ -47,7 +48,6 @@ AudioThread::~AudioThread() {
 // 耗时操作应该放在run函数中
 void AudioThread::run() {
     qDebug() << this << "开始执行----------";
-
     // 获取输入格式对象
     const AVInputFormat *fmt = av_find_input_format(FMT_NAME);
     if (!fmt) {
@@ -60,8 +60,8 @@ void AudioThread::run() {
 //    // -i
 //    const char *deviceName = ":0";
     // 选项
-//    AVDictionary *options = nullptr;
-    int ret = avformat_open_input(&ctx, DEVICE_NAME, fmt, nullptr);
+    AVDictionary *options = nullptr;
+    int ret = avformat_open_input(&ctx, DEVICE_NAME, fmt, &options);
     if (ret < 0) {
         char errbuf[1024];
         av_strerror(ret, errbuf, sizeof(errbuf));
@@ -69,57 +69,63 @@ void AudioThread::run() {
         return;
     }
     // 文件名
-    QFile file(FILENAME);
+    QString filename = FILEPATH;
+    filename += QDateTime::currentDateTime().toString("MM_dd_HH_mm_ss");
+    filename += ".pcm";
+    QFile file(filename);
     // 打开文件
     // WriteOnly:只写模式。如果文件不存在，创建文件;如果文件存在，就删除文件内容
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "打开文件失败" << FILENAME;
+        qDebug() << "打开文件失败" << FILEPATH;
         // 关闭设备
         avformat_close_input(&ctx);
         return;
     };
-    // 暂时假定只采集50个数据包
+
+
+    // 第一种方式
+    // 数据包
+//    AVPacket pkt;
+//    while (!isInterruptionRequested()) {
+//        // 不断采集数据
+//        ret = av_read_frame(ctx, &pkt);
+//        if (ret == 0){ // 读取成功
+//            // 将数据写入文件
+//            file.write((const char *) pkt.data, pkt.size);
+//        }
+//        // 必须要加，释放pkt内部的资源
+//        av_packet_unref(&pkt);
+//    }
+
+//     暂时假定只采集50个数据包
 //    int count = 50;
 
-    // 数据包
-    AVPacket pkt;
-    while (!isInterruptionRequested()) {
-        // 不断采集数据
-        ret = av_read_frame(ctx, &pkt);
-        if (ret == 0){
-            // 将数据写入文件
-            file.write((const char *) pkt.data, pkt.size);
-        }
-        // 必须要加，释放pkt内部的资源
-        av_packet_unref(&pkt);
-    }
+    // 第二种方式数据包
+    AVPacket *pkt = av_packet_alloc();
 
-    // 数据包
-//    AVPacket *pkt = av_packet_alloc();
-////    while (!_stop&&count-- > 0) {
-//    while (!isInterruptionRequested() && count-- > 0) {
-//        // 从设备中采集数据，返回值为0，代表采集数据成功
-//        ret = av_read_frame(ctx, pkt);
-//
-//        if (ret == 0) { // 读取成功
-//            // 将数据写入文件
-//            file.write((const char *) pkt->data, pkt->size);
-//
-//            // 释放资源
-////            av_packet_unref(pkt);
-//        } else if (ret == AVERROR(EAGAIN)) { // 资源临时不可用
-//            continue;
-//        } else { // 其他错误
-//            char errbuf[1024];
-//            av_strerror(ret, errbuf, sizeof(errbuf));
-//            qDebug() << "av_read_frame error" << errbuf << ret;
-//            break;
-//        }
-//    }
+    while (!isInterruptionRequested()) {
+        // 从设备中采集数据，返回值为0，代表采集数据成功
+        ret = av_read_frame(ctx, pkt);
+
+        if (ret == 0) { // 读取成功
+            // 将数据写入文件
+            file.write((const char *) pkt->data, pkt->size);
+
+            // 释放资源
+            av_packet_unref(pkt);
+        } else if (ret == AVERROR(EAGAIN)) { // 资源临时不可用
+            continue;
+        } else { // 其他错误
+            char errbuf[1024];
+            av_strerror(ret, errbuf, sizeof(errbuf));
+            qDebug() << "av_read_frame error" << errbuf << ret;
+            break;
+        }
+    }
     // 关闭文件
     file.close();
     // 释放资源
-//    av_packet_free(&pkt);
+    av_packet_free(&pkt);
     // 关闭设备
     avformat_close_input(&ctx);
     qDebug() << this << "正常结束----------";

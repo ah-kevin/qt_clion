@@ -7,6 +7,7 @@
 #include "single/sender.h"
 #include "single/receiver.h"
 #include "audiothread.h"
+#include "SDL2/SDL.h"
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui_MainWindow) {
@@ -24,6 +25,11 @@ void MainWindow::on_audioButton_clicked() {
         // 开启线程
         _audioThread = new AudioThread(this);
         _audioThread->start();
+        connect(_audioThread, &AudioThread::finished, [this]() {
+            // 线程结束
+            _audioThread = nullptr;
+            ui->audioButton->setText("开始录音");
+        });
         ui->audioButton->setText("结束录音");
     } else {
         // 结束录音
@@ -32,6 +38,12 @@ void MainWindow::on_audioButton_clicked() {
         _audioThread = nullptr;
         ui->audioButton->setText("开始录音");
     }
+}
+
+[[maybe_unused]] void MainWindow::on_registerButton_clicked() {
+    SDL_version version;
+    SDL_VERSION(&version);
+    qDebug() <<version.major <<version.minor << version.patch;
 }
 
 void MainWindow::slotAndSingle() {

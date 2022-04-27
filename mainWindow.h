@@ -22,6 +22,7 @@ public:
 
 private slots:
     void on_audioButton_clicked();// clazy:exclude=connect-by-name
+    [[maybe_unused]] static void on_registerButton_clicked();// clazy:exclude=connect-by-name
 
 private:
     struct Ui_MainWindow *ui{};
