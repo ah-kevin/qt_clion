@@ -39,7 +39,7 @@ void pull_audio_data(void *userdata, Uint8 *stream, int len) {
     SDL_memset(stream, 0, len);
     // 文件数据还没准备好
     if (bufferLen<=0) return;
-    // 取len，bufferlen的最小值
+    // 取len，bufferlen的最小值 (为了保证数据安全，防止指针越界)
     len = (len>bufferLen) ? bufferLen:len;
     // 填充数据
     SDL_MixAudio(stream,(Uint8 *)bufferData,len,SDL_MIX_MAXVOLUME);
@@ -96,6 +96,7 @@ void PlayThread::run() {
     char data[BUFFER_SIZE];
     while (!isInterruptionRequested()) {
        bufferLen = file.read(data, BUFFER_SIZE);
+       // 文件数据已经读完毕
        if(bufferLen<=0) break;
 
        // 读取到了文件数据
