@@ -11,7 +11,12 @@
 #define SAMPLE_RATE 44100
 #define SAMPLE_SIZE 16
 #define CHANNELS 2
-#define BUFFER_SIZE 4096
+// 音频缓冲区的样本数量
+#define SAMPLES 1024
+// 每个样本占用多少个字节
+#define BYTES_PER_SAMPLE ((SAMPLE_SIZE * CHANNELS) /8)
+// 文件缓冲区的大小
+#define BUFFER_SIZE (SAMPLES * BYTES_PER_SAMPLE)
 
 PlayThread::PlayThread(QObject *parent) : QThread(parent) {
     connect(this, &PlayThread::finished,
@@ -95,18 +100,28 @@ void PlayThread::run() {
     // 存放从文件种读取的数据
     char data[BUFFER_SIZE];
     while (!isInterruptionRequested()) {
-       bufferLen = file.read(data, BUFFER_SIZE);
-       // 文件数据已经读完毕
-       if(bufferLen<=0) break;
+        // 只要从文件中读取的音频数据，还没有填充完毕，就跳过
+        if (bufferLen > 0 ) continue;
+        bufferLen = file.read(data, BUFFER_SIZE);
+        // 文件数据已经读完毕
+        if(bufferLen<=0) break;
 
-       // 读取到了文件数据
-       bufferData = data;
-       //等待音频数据填充完毕
-       // 只要音频数据还没有填充完毕，就Delay(sleep)
-        while (bufferLen>0){
-            SDL_Delay(1);
-        }
+        // 读取到了文件数据
+        bufferData = data;
     }
+//    while (!isInterruptionRequested()) {
+//       bufferLen = file.read(data, BUFFER_SIZE);
+//       // 文件数据已经读完毕
+//       if(bufferLen<=0) break;
+//
+//       // 读取到了文件数据
+//       bufferData = data;
+//       //等待音频数据填充完毕
+//       // 只要音频数据还没有填充完毕，就Delay(sleep)
+//        while (bufferLen>0){
+//            SDL_Delay(1);
+//        }
+//    }
     // 关闭文件
     file.close();
     ///关闭设备
