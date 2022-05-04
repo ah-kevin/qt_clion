@@ -28,5 +28,6 @@ private:
     struct Ui_MainWindow *ui{};
     void slotAndSingle();
     struct AudioThread *_audioThread = nullptr;
+    struct PlayThread  *_playThread = nullptr;
 };
 #endif //QT_CLION_MAINWINDOW_H

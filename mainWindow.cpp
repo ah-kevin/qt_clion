@@ -48,8 +48,21 @@ void MainWindow::on_registerButton_clicked() {
     //    SDL_version version;
     //    SDL_VERSION(&version);
     //    qDebug() <<version.major <<version.minor << version.patch;
-    auto playThread = new PlayThread(this);
-    playThread->start();
+    if (_playThread) { // 停止播放
+        _playThread->requestInterruption();
+        _playThread = nullptr;
+        ui->registerButton->setText("开始播放");
+    } else { // 开始播放
+        _playThread= new PlayThread(this);
+        _playThread->start();
+        connect(_playThread, &PlayThread::finished, [this]() {
+            // 线程结束
+            _playThread = nullptr;
+            ui->registerButton->setText("开始播放");
+        });
+        ui->registerButton->setText("停止播放");
+    }
+
 }
 
 void MainWindow::slotAndSingle() {
