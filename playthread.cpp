@@ -15,7 +15,8 @@
 // 音频缓冲区的样本数量
 #define SAMPLES 1024
 // 每个样本占用多少个字节
-#define BYTES_PER_SAMPLE ((SAMPLE_SIZE * CHANNELS) /8)
+//#define BYTES_PER_SAMPLE ((SAMPLE_SIZE * CHANNELS) /8)
+#define BYTES_PER_SAMPLE ((SAMPLE_SIZE * CHANNELS) >> 3)
 // 文件缓冲区的大小
 #define BUFFER_SIZE (SAMPLES * BYTES_PER_SAMPLE)
 

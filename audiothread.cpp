@@ -26,7 +26,7 @@ extern "C" {
 #else
 #define FMT_NAME "avfoundation"
 #define DEVICE_NAME ":0"
-#define FILEPATH "/Users/bjke/workspaces/c++/qt-sound/data"
+#define FILEPATH "/Users/bjke/workspaces/c++/qt-sound/data/"
 #endif
 
 AudioThread::AudioThread(QObject *parent) : QThread(parent) {
@@ -43,6 +43,20 @@ AudioThread::~AudioThread() {
     qDebug() << this << "析构（内存被回收）";
 }
 
+void showSpec(AVFormatContext *ctx) {
+    // 获取stream输入流
+    AVStream *stream = ctx->streams[0];
+    // 获取音频参数
+    AVCodecParameters *params = stream->codecpar;
+    // 声道数
+    qDebug() << params->channels;
+    // 采样率
+    qDebug() << params->sample_rate;
+    // 采样格式
+    qDebug() << params->format;
+    // 每一个样本的一个声道占用多少个字节
+    qDebug()<< av_get_bytes_per_sample((AVSampleFormat)params->format);
+}
 // 当线程启动的时候(start),就会自动调用run函数
 // run函数中的代码是在子线程中执行的x
 // 耗时操作应该放在run函数中
@@ -68,6 +82,8 @@ void AudioThread::run() {
         qDebug() << "打开设备失败" << errbuf;
         return;
     }
+    // 打印一下录音设备的参数信息
+    showSpec(ctx);
     // 文件名
     QString filename = FILEPATH;
     filename += QDateTime::currentDateTime().toString("MM_dd_HH_mm_ss");
@@ -130,6 +146,7 @@ void AudioThread::run() {
     avformat_close_input(&ctx);
     qDebug() << this << "正常结束----------";
 }
+
 
 //void AudioThread::setStop(bool stop) {
 //    _stop = stop;
