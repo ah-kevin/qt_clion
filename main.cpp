@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QTranslator>
 #include "mainWindow.h"
+#include "FFmpegs.h"
 
 // 纯C语言的
 extern "C" {
@@ -9,9 +10,16 @@ extern "C" {
 }
 
 int main(int argc, char *argv[]) {
-//    QCoreApplication a(argc, argv);
-//    qDebug() << "Hello World";
-//    return QCoreApplication::exec();
+    WAVHeader wavHeader;
+    wavHeader.riffChunkDataSize = 1767996;
+    wavHeader.sampleRate=44100;
+    wavHeader.bitsPerSample = 16;
+    wavHeader.numChannels =2;
+    wavHeader.blockAlign = wavHeader.byteRate * wavHeader.numChannels >> 3;
+    wavHeader.byteRate = wavHeader.sampleRate * wavHeader.blockAlign;
+    wavHeader.dataChunkDataSize = 1767960;
+    // pcm转wav文件
+    FFmpegs::pcm2wav(wavHeader, "/Users/bjke/workspaces/c++/qt-sound/in.pcm", "/Users/bjke/workspaces/c++/qt-sound/in.wav");
 
     // 注册设备
     avdevice_register_all();

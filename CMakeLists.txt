@@ -20,7 +20,7 @@ include_directories(/opt/homebrew/Cellar/sdl2/2.0.20/include/)
 link_directories(/opt/homebrew/Cellar/ffmpeg/5.0.1/lib/)
 link_directories(/opt/homebrew/Cellar/sdl2/2.0.20/lib/)
 
-add_executable(qt_clion MACOSX_BUNDLE main.cpp mainWindow.h mainWindow.cpp mainWindow.ui single/sender.cpp single/sender.h single/receiver.cpp single/receiver.h audiothread.cpp audiothread.h playthread.cpp playthread.h)
+add_executable(qt_clion MACOSX_BUNDLE main.cpp mainWindow.h mainWindow.cpp mainWindow.ui single/sender.cpp single/sender.h single/receiver.cpp single/receiver.h audiothread.cpp audiothread.h playthread.cpp playthread.h FFmpegs.cpp FFmpegs.h)
 target_link_libraries(qt_clion
         Qt::Core
         Qt::Widgets
