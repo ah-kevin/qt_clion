@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include "audiothread.h"
+#include "FFmpegs.h"
 
 extern "C" {
 // 设备相关API
@@ -52,14 +53,16 @@ void showSpec(AVFormatContext *ctx) {
     qDebug() << params->channels;
     // 采样率
     qDebug() << params->sample_rate;
+
 //    // 采样格式（mac不行）
 //    qDebug() << params->format;
 //    // 每一个样本的一个声道占用多少个字节(mac不行）
 //    qDebug() << av_get_bytes_per_sample((AVSampleFormat) params->format);
+
     // 编码ID（可以看出采样格式）
-    qDebug() <<  params->codec_id;
+    qDebug() << params->codec_id;
     // 每一个样本的一个声道占用多少位
-    qDebug() << av_get_bits_per_sample(params->codec_id);
+    qDebug() << "每一个样本的一个声道占用多少位" << av_get_bits_per_sample(params->codec_id);
 }
 
 // 当线程启动的时候(start),就会自动调用run函数
@@ -92,7 +95,9 @@ void AudioThread::run() {
     // 文件名
     QString filename = FILEPATH;
     filename += QDateTime::currentDateTime().toString("MM_dd_HH_mm_ss");
+    QString wavname = filename;
     filename += ".pcm";
+    wavname += ".wav";
     QFile file(filename);
     // 打开文件
     // WriteOnly:只写模式。如果文件不存在，创建文件;如果文件存在，就删除文件内容
@@ -147,6 +152,24 @@ void AudioThread::run() {
     file.close();
     // 释放资源
     av_packet_free(&pkt);
+
+    WAVHeader wavHeader;
+    // 获取stream输入流
+    AVStream *stream = ctx->streams[0];
+    // 获取音频参数
+    AVCodecParameters *params = stream->codecpar;
+    // 采样率
+    wavHeader.sampleRate = params->sample_rate;
+    // 每一个样本的一个声道占用多少位
+    wavHeader.bitsPerSample = av_get_bits_per_sample(params->codec_id);
+    // 声道数
+    wavHeader.numChannels = params->channels;;
+    if (params->codec_id >= AV_CODEC_ID_PCM_F32BE) {
+        wavHeader.audioFormat = AUDIO_FORMAT_FLOAT;
+    }
+    // pcm转wav文件
+    FFmpegs::pcm2wav(wavHeader, filename.toUtf8().data(), wavname.toUtf8().data());
+
     // 关闭设备
     avformat_close_input(&ctx);
     qDebug() << this << "正常结束----------";

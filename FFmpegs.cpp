@@ -7,6 +7,8 @@
 #include <QDebug>
 
 void FFmpegs::pcm2wav(WAVHeader &header, const char *pcmFilename, const char *wavFilename) {
+    header.blockAlign = header.byteRate * header.numChannels >> 3;
+    header.byteRate = header.sampleRate * header.blockAlign;
     // 打开pcm文件
     QFile pcmFile(pcmFilename);
 
@@ -15,6 +17,8 @@ void FFmpegs::pcm2wav(WAVHeader &header, const char *pcmFilename, const char *wa
         qDebug() << "打开文件失败" << pcmFilename;
         return;
     };
+    header.dataChunkDataSize = pcmFile.size();
+    header.riffChunkDataSize = header.dataChunkDataSize + sizeof(WAVHeader) - 8;
 
     // 打开wav文件
     QFile wavFile(wavFilename);

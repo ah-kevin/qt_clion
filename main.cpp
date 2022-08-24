@@ -10,16 +10,14 @@ extern "C" {
 }
 
 int main(int argc, char *argv[]) {
-    WAVHeader wavHeader;
-    wavHeader.riffChunkDataSize = 1767996;
-    wavHeader.sampleRate=44100;
-    wavHeader.bitsPerSample = 16;
-    wavHeader.numChannels =2;
-    wavHeader.blockAlign = wavHeader.byteRate * wavHeader.numChannels >> 3;
-    wavHeader.byteRate = wavHeader.sampleRate * wavHeader.blockAlign;
-    wavHeader.dataChunkDataSize = 1767960;
-    // pcm转wav文件
-    FFmpegs::pcm2wav(wavHeader, "/Users/bjke/workspaces/c++/qt-sound/in.pcm", "/Users/bjke/workspaces/c++/qt-sound/in.wav");
+//    WAVHeader wavHeader;
+//    wavHeader.sampleRate=44100;
+//    wavHeader.bitsPerSample = 32;
+//    wavHeader.numChannels =1;
+//    wavHeader.audioFormat = 3;
+//    // pcm转wav文件
+//    FFmpegs::pcm2wav(wavHeader, "/Users/bjke/workspaces/c++/qt-sound/data/48000_f32le_1.pcm",
+//                     "/Users/bjke/workspaces/c++/qt-sound/data/48000_f32le_1.wav");
 
     // 注册设备
     avdevice_register_all();
